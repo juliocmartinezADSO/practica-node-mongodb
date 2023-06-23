@@ -1,0 +1,82 @@
+<%- include("template/header") %>
+<div class="container">
+  <h1>Detalle Mascota</h1>
+  <% if (error) { %>
+  <p><%= mensaje %></p>
+  <a href="/mascotas" class="btn btn-dark btn-block">Volver a Mascotas</a>
+  <% } %> <% if (!error) { %>
+
+  <form id="editar" data-id="<%=mascota.id  %>">
+    <input
+      type="text"
+      class="form-control my-2"
+      name="nombre"
+      value="<%= mascota.nombre %>"
+    />
+    <input
+      type="text"
+      class="form-control my-2"
+      name="descripcion"
+      value="<%= mascota.descripcion %>"
+    />
+    <button class="btn btn-warning btn-block w-100">Editar</button>
+  </form>
+  <hr />
+  <td>
+    <button
+      class="btn btn-danger btn-sm mt-5"
+      id="btnEliminar"
+      data-id="<%= mascota.id %>"
+    >
+      Eliminar
+    </button>
+
+    <% } %>
+  </td>
+</div>
+
+<%- include('./template/footer') %>
+
+<script>
+const formEditar = document.querySelector('#editar')
+formEditar.addEventListener('submit', async(e)=>{
+  e.preventDefault()
+  const nombre = formEditar.elements['nombre'].value
+  const descripcion = formEditar.elements['descripcion'].value
+  const id = formEditar.dataset.id
+
+  const data = await fetch(`/mascotas/${id}`,{
+    method:'PUT',
+    headers:{
+      'Content-Type': 'application/json'
+    },
+    body:JSON.stringify({nombre, descripcion})
+  })
+
+  const res = await data.json()
+  if(res.estado){
+    window.location.href='/mascotas'
+  }else{
+    console.log(res);
+  }
+
+})
+
+  const btnEliminar = document.querySelector("#btnEliminar");
+  btnEliminar.addEventListener("click", async () => {
+    const id = btnEliminar.dataset.id;
+    try {
+      const data = await fetch(`/mascotas/${id}`, {
+        method: "delete",
+      });
+      const res = await data.json();
+      if (res.estado) {
+        window.location.href = "/mascotas";
+      } else {
+        console.log(res);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
+</script>
